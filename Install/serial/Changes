@@ -1,0 +1,167 @@
+Revision history for Perl extension Win32API::SerialPort.
+
+0.01  Tue Apr 14 12:01:47 1998
+	- original version; created by h2xs 1.18
+	- command: h2xs -X -n SerialPort
+
+0.02  Thu Apr 16 15:53:30 1998
+	- extensive edits to pod section
+	- consolidate pre-existing code fragments
+	- post documentation for comments
+
+0.03  Sun Apr 26 22:24:47 1998
+	- add test1.pl
+	- extensive bug fixes while developing tests
+
+0.04  Mon May 25 15:14:30 1998
+	- significant additions to test1.pl
+	- add test2.pl, demo1.pl, demo2.pl, README.txt
+	- first version with read and write functions
+	- first public alpha
+
+0.05  Sun May 31 21:26:02 1998
+	- rewrite tests using "is_ok", "is_bad", "is_zero" subroutines
+	- abort "start" on parameter validation failure
+	- rename tests to ".t" and demos to ".plx"
+	- add fourth return value to status and reset_error.
+	- Add built-in error messages and use in demo?.plx
+	- add read_bg, write_bg, read_done, write_done (background I/O)
+
+0.06  Fri Jun 05 17:38:20 1998
+	- make sure baudrate and databits interpreted as integers
+	- Add AltPort.pm and test3.t for Inheritance testing
+	- Add demo3.plx as setup example
+	- Clone README.txt to preferred CPAN name
+	- Add Makefile.PL (as stub) for CPAN
+	- Add parity_enable. Other DCB bits not implemented yet
+
+0.07  Tue Jun 16 22:43:20 1998
+	- Add test4.t for Inheritance testing
+	- Makefile.PL runs Test::Harness on 5.004 (GS)
+	- Export :COMM constants on request
+	- Fixes for status on NT (differs from Win95) - add BM_AllBits
+	- Purge now clears read/write busy
+	- Save error_msg/user_msg in configuration file
+
+0.08  Wed Jun 17 21:56:11 1998
+	- Add demo4.plx
+	- Add description of "required" parameters
+	- Fix bug that "required" all the timing and buffer parameters
+	- Small fixes to test?.t for "-w" warnings
+
+0.09  Fri Aug 21 xx:xx:xx 1998
+	- First pre-beta, no general distribution
+	- Rename :COMM exports to :STAT
+	- Make "handshake" recommended rather than required
+	- Add restart
+	- Add demo5.plx
+	- Split into Win32:SerialPort(user) and Win32API::CommPort(raw)
+
+0.10  Sat Aug 29 23:18:50 1998
+	- First public beta
+	- Add demo6.plx and test5.t
+	- Add :RAW :COMPROP :PARAM :DCB :ALL exports to CommPort.pm
+	- Add $ResetEvent to CommPort.pm
+	- Fix a number of timing bugs
+
+0.11  Mon Sep 14 23:40:00 1998
+	- Add current baud to ok list
+	- add error messages
+	- allow set_write_buf(0)
+	- limited release to test TPJ examples and bug fixes
+
+0.12  Sun Nov 08 23:40:00 1998
+	- MAJOR UPDATE - Second public beta
+	- Modify CommPort.pm to export subroutine wrappers instead of
+	  API objects under tag "RAW:". Many related changes in test5.t
+	- Add perl version test to Makefile.PL
+	- Add Install.PL and blib subdirectory tree (5.004 and above)
+	- Add options.plx to aid in debugging after installation
+	- Update MANIFEST, README and documentation
+	- Add error messages for failed "save" and "write_settings" 
+	- Fix bugs in range checking for "baudrate" and "buffers"
+	- Rename API objects to "$_object"
+	- Delete $_GetLocalError
+	- Use "my $dcb" instead of $self->{"_DCB"} in CommPort.pm
+	- Move test suite files to "t" subirectory (5.004 and above)
+	- Add "use blib" to the test suite
+	- Revise demo*.plx to use proper Namespaces
+	- Create "Build_3xx" subdirectory for non-Makamaker test suite
+	- Add manual install instructions for ActiveState build 3xx
+
+0.13  Sat Nov 28 19:35:05 1998
+	- Third public beta
+	- Add lookfor, lookclear, lastlook, are_match, input-loopback,
+	  is_prompt, and stty-like functions (MAJOR ENHANCEMENT)
+	- Consolidate demo5.plx and demo6.plx using lookfor et. al.
+	- Rewrite Makefile.PL and Install.PL to eliminate need for
+	  "Build_3xx" subdirectory, add test suite support for Build_3xx,
+	  and "use lib" instead of "use blib" (which CPAN reserves for
+	  binary distributions)
+	- Add html install for 5.004 and above
+	- All t/test* files modified - test4.plx extensively (testing
+	  new functions)
+
+0.14  Sun Feb 07 23:41:00 1999
+	- Fourth public beta
+	- Add Tied FileHandle support (MAJOR ENHANCEMENT)
+	- Several enhancments to lookfor:
+	    Explicit Regular Expression support much like expect
+	    Block until $count characters received option
+            Both match_pattern and input_that_matched returned by lastlook
+	- Fix bug in CloseHandle with prevented reopening port in same
+	  process. Add return value to "close" method.
+	- Revise Makefile.PL to improve test suite support for Build_3xx
+	- Add "$no_silly_warnings" to CommPort for Build_3xx
+	- Numerous documentation changes
+	- Delete never-used "dosmode" constructor
+	- add demo6.plx and t/test6.t for tied FileHandles
+
+0.15  Sun May 09 16:25:40 1999
+	- First production release.
+	- Add $RBUF_Size and internal_buffer().
+	- Add $quiet option to new.
+	- Correct bugs in handshake off control masks.
+	- Rename "eof" and "kill" to s_eof and s_kill to reduce confusion with
+	  Perl builtin functions.
+	- Add stty method and opost parameter.
+	- Default stty_xxx setup for raw port rather than dumb terminal.
+	- Add compiled regex support for are_match.
+	- Add streamline, lastline, linesize, matchclear.
+	- Add $instead to lastlook.
+	- Recode lookfor to improve efficiency.
+	- Improve error handling on write timeout.
+	- Add cntl_char and argv_char subs to support stty.
+	- Add test suite port option to Makefile.PL
+	- Extensive test suite additions
+	- small changes in demo4.plx amd demo6.plx, large ones in demo5.plx
+	- new demo7.plx, demo8.plx, stty.plx
+	- on CPAN as Version 0.150 due to upload problem
+
+0.16  Sun July 18 15:17:15 1999
+	- Second production release.
+	- Add "pulse_xxx" functions to support CM17 device on MisterHouse
+	- Remove "list context" support from binary methods in CommPort.
+	  Most were read_only anyway. Reflected in test1.t and test3.t.
+	- Disable stty_eof unless stty_icanon (bug).
+	- Add methods for the seldom used DCB bits like ignore_null.
+	- Improved documentation on timeouts.
+
+0.17  Fri August 13 16:30:15 1999
+	- Add output_record and output_field separator support
+	- Add get_tick_count wrapper for Win32::GetTickCount()
+	- Add stty_opost function to tied syswrite
+
+0.18  Wed September 8 23:39:17 1999
+	- add saved utility parameters and methods (hostname, et.al)
+	- add any_os.plx
+	- major rewrite of Makefile.PL to improve "make deprived" install
+	- correct misnamed output_rts to output_cts
+	- changes in all test programs, especially t/test2.t and t/test4.t 
+
+0.19  Thu November 4 20:26:12 1999
+	- fixed problem setting $Babble and $Verbose via debug & debug_comm
+	- deleted useless array-context return from debug & debug_comm
+	- updates to test1.t, test3.t, and new demo9.plx
+	- move demos to eg directory
+

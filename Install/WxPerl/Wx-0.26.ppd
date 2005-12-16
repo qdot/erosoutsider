@@ -1,0 +1,10 @@
+<SOFTPKG NAME="Wx" VERSION="0,26,0,0">
+	<TITLE>Wx</TITLE>
+	<ABSTRACT>interface to the wxWindows GUI toolkit</ABSTRACT>
+	<AUTHOR>Mattia Barbon &lt;MBARBON@cpan.org&gt;</AUTHOR>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+                <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+                <CODEBASE HREF="wxPerl-0.26-wx-2.6.2-win32-5.8.6.tar.gz" />
+        </IMPLEMENTATION>
+</SOFTPKG>

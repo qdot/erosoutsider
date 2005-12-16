@@ -1,0 +1,150 @@
+
+-------Hello Messages-------
+
+Send    00
+Recv    07
+Send    00
+Recv    07
+
+-----Sync Messages--------
+
+Send   2F QR YY       QR is randomly chosen. YY = sumcheck
+Recv   21 ST YY       ST is ramdomly chosen. YY = sumcheck
+
+these two messages specify a MOD char.  The MOD char
+is XOR'd with each byte sent from computer to ET312.
+The MOD char is calculated as follows:
+
+   MOD = RQ ^ ST     
+
+(note nibbles of Send byte are reversed in calculation)
+
+
+Example #1:
+Send  2F 00 2F
+Revc  21 24 45     MOD = 24 = 00 ^ 24
+
+
+Example #2:
+Send 2F BC EB
+Revc 21 A6 C7      MOD = 6D = CB ^ A6
+
+-----Inquiry Messages-------
+              
+B-timing off: 69 14 cc 43    reply: 22 [00-ff]     
+B-timing on:  69 14 cd 40    reply: 22 [00-ff]    
+B-time opt:   69 14 cf 42    reply: 22 [FN]   F (time off) 0=normal  2=Tempo    4=MA
+                                              N (time on)  1=normal  5=EFFECT   9=MA         
+B-freq opt:   69 14 e0 67    reply: 22 RV SS  R: 0=rate/none   2=rate/EFFECT    4=rate/MA
+                                              V: 1=none    4=val/freq   5=max/freq   8=val/MA   9=max/MA  
+B-width:      69 14 e2 61    reply: 22 [40-ff]  
+B-freq rate:  69 14 e4 7b    reply: 22 [00-ff]         
+B-freq min:   69 14 e5 78    reply: 22 [08-ff]          
+B-width opt:  69 14 eb 6e    RV   R:  0=none    2=pace         4=MA
+                                  V:  1=none    4=val/width    5=min/width  
+B-width max:  69 14 ec 63    reply: 22 [40-ff] 
+B-width min:  69 14 ed 60    reply: 22 [40-ff]   
+B-width rate: 69 14 ef 62    reply: 22 [00-ff]       
+B-level:      69 14 f0 77    reply: 22 [85-ff]    
+B-level max:  69 14 f2 71                       
+B-level min:  69 14 f3 76    reply: 22 [7f-ff]  
+B-level opt:  69 14 f9 7c    01=none   05 = depth       00=none   40=MA      20=tempo  
+B-freq max:   69 14 fa 79    reply: 22 [08-ff]      
+B-freq:       69 14 fb 7e    reply: 22 [08-ff]  
+B-level rate: 69 14 fd 70    
+
+Routine #:    69 15 2e a2    reply: 22 NN SS   NN: 00=none   76=waves   77=stroke  78=climb
+                                                   79=combo  7A=intense 7B=rhythm  7C=audio1
+                                                   7D=audio2 7E=audio3  7F=split   80=random1
+                                                   81=random2 82=toggle  83=orgasm 84=torment
+                                                   85=phase1  86=phase2  87=phase3 88=user1
+                                                   89=user2   8A=user3
+
+A-timing off: 69 15 cc 40    reply: 22 [00-ff]  
+A-timing on:  69 15 cd 41    reply: 22 [00-ff]    
+A-time opt:   69 15 cf 43    reply: 22 [FN]   F (time off) 0=normal  2=Tempo    4=MA
+                                              N (time on)  1=normal  5=EFFECT   9=MA    
+A-freq opt:   69 15 e0 64    reply: 22 RV SS  R: 0=rate/none   2=rate/EFFECT    4=rate/MA
+                                              V: 1=none    4=val/freq   5=max/freq   8=val/MA   9=max/MA  
+
+A-width:      69 15 e2 66    reply: 22 [40-ff]
+A-freq rate:  69 15 e4 78    reply: 22 [00-ff]          
+A-freq min:   69 15 e5 79    reply: 22 [00-ff]    
+A-width opt:  69 15 eb 6f        RV   R:  0=none    2=pace         4=MA
+                                      V:  1=none    4=val/width    5=min/width    
+A-width max:  69 15 ec 60    reply: 22 [40-ff]        
+A-width min:  69 15 ed 61    reply: 22 [40-ff]  
+A-width rate: 69 15 ef 63    reply: 22 [00-ff]        
+A-level:      69 15 f0 74    reply: 22 [80-ff]   
+A-level max:  69 15 f2 76    reply: 22 [80-ff]
+A-level min:  69 15 f3 77                        
+A-level opt:  69 15 f9 7d    01=none   05 = depth        10=none   50=MA      30=tempo
+    note:  channel A & B level options use different codes for RATE options
+A-freq max:   69 15 fa 7e    reply: 22 [00-ff]    
+A-freq:       69 15 fb 7f    reply: 22 [00-ff]
+A-level rate: 69 15 fd 71      
+
+
+-----------------Set Values-----------------  (replies:  06=good 07=bad)
+
+Set A-timing off:     18 15 cc VV CC      VV = 0x55 ^  ( 0x00-0xFF ) 
+Set A-timing on:      18 15 cd VV CC      VV = 0x55 ^  ( 0x00-0xFF )    
+Set A-time options:   18 15 cf xx xx      (on/off)  (no,no)    =54 7d     (MA,no)=5C 65      (EFFECT,no)=50 79 
+                                                    (no,MA)    =14 3d     (MA,MA)=1C 25      (EFFECT,MA)=10 39
+                                                    (no,TEMPO) =74 1d  (MA,TEMPO)=7C 05   (EFFECT,TEMPO)=70 19
+   
+Set A-Level:          18 15 f0 VV CC      VV = 0x55 ^  ( 0x80-0xFF )    
+Set A-Level min:      18 15 f3 VV CC      VV = 0x55 ^  ( 0x80-0xFF ) 
+Set A-Level max:      18 15 f2 VV CC      VV = 0x55 ^  ( 0x80-0xFF ) 
+Set A-Level opt:      18 15 F9 xx xx         none=44 1f         tempo=64 3F              MA= 04 df  
+                                            depth=40 1b         depth+tempo=60 3b        depth+MA=00 db
+Set A-Level rate:     18 15 fd VV CC      VV = 0x55 ^  ( 0x00-0xff )
+
+Set A-freq:           18 15 fb VV CC      VV = 0x55 ^  ( 0x00-0xFF ) 
+Set A-freq min:       18 15 e5 VV CC      VV = 0x55 ^  ( 0x00-0xFF ) 
+Set A-freq max:       18 15 fa VV CC      VV = 0x55 ^  ( 0x00-0xFF ) 
+Set A-freq rate:      18 15 e4 VV CC      VV = 0x55 ^  ( 0x00-0xFF ) 
+Set A-freq opt:       18 15 e0 xx xx         
+      RATE=NONE.....    none 54 16        val/MA 5d 1f    val/freq  51 13    max/MA 5c 1e    max/freq 50 12  
+      RATE=MA.......    none 14 d6        val/MA 1d df    val/freq  11 d3    max/MA 1c de    max/freq 10 d2  
+      RATE=EFFECT...    none 74 36        val/MA 7d 3f    val/freq  71 33    max/MA 7c 3e    max/freq 70 32  
+
+Set A-width:          18 15 e2 VV CC      VV = 0x55 ^  ( 0x40-0xFF ) 
+Set A-width min:      18 15 ed VV CC      VV = 0x55 ^  ( 0x40-0xFF ) 
+Set A-width max:      18 15 ec VV CC      VV = 0x55 ^  ( 0x40-0xFF ) 
+Set A-width rate:     18 15 ef VV CC      VV = 0x55 ^  ( 0x00-0xFF ) 
+Set A-width options:  18 15 eb VV CC      (rate/value)  (no,no)=54 19         (pace,no)=74 39          (MA,no)=14 d9
+                                                        (no,val/width)=51 1a  (pace,val/width)=71 3a   (MA,val/width)=11 da
+                                                        (no,min/width)=50 05  (pace,min/width)=70 25   (MA,min/width))=10 c5
+
+
+Set B-timing on:      18 14 cd VV CC      VV = 0x55 ^  ( 0x00-0xFF )    
+Set B-timing opt:     18 14 cf xx xx      neither=54 7c     MA=5C 64     EFFECT=50 78    
+Set B-time options:   18 14 cf xx xx      (on/off)  (no,no)    =54 7c     (MA,no)=5C 64      (EFFECT,no)=50 78 
+                                                    (no,MA)    =14 3c     (MA,MA)=1C 24      (EFFECT,MA)=10 38
+                                                    (no,TEMPO) =74 1c  (MA,TEMPO)=7C 04   (EFFECT,TEMPO)=70 18
+   
+Set B-Level:          18 14 f0 VV CC      VV = 0x55 ^  ( 0x80-0xFF ) 
+Set B-Level min:      18 14 f3 80 5c      VV = 0x55 ^  ( 0x80-0xFF ) 
+Set B-Level max:      18 14 f2 80 5f      VV = 0x55 ^  ( 0x80-0xFF ) 
+Set B-Level rate:     18 14 fd VV CC      VV = 0x55 ^  ( 0x00-0xff )
+Set B-Level opt:      18 14 F9 xx xx           none= 54 6e         tempo=74 0e               MA= 14 2e
+                                            depth=50 6a         depth+tempo=70 0a         depth+MA=10 2a
+Set B-freq:           18 14 fb VV CC      VV = 0x55 ^  ( 0x00-0xFF ) 
+Set B-freq min:       18 14 e5 VV CC      VV = 0x55 ^  ( 0x00-0xFF ) 
+Set B-freq max:       18 14 fa VV CC      VV = 0x55 ^  ( 0x00-0xFF ) 
+Set B-freq rate:      18 14 e4 VV CC      VV = 0x55 ^  ( 0x00-0xFF ) 
+Set B-freq opt:       18 15 e0 xx xx         
+      RATE=NONE.....    none 54 11        val/MA 5d 1e    val/freq  51 12    max/MA 5c 19    max/freq 50 1d  
+      RATE=MA.......    none 14 d1        val/MA 1d de    val/freq  11 d2    max/MA 1c d9    max/freq 10 dd  
+      RATE=EFFECT...    none 74 31        val/MA 7d 3e    val/freq  71 32    max/MA 7c 39    max/freq 70 3d  
+
+Set B-width:          18 14 e2 VV CC      VV = 0x55 ^  ( 0x40-0xFF ) 
+Set B-width min:      18 14 ed VV CC      VV = 0x55 ^  ( 0x40-0xFF ) 
+Set B-width max:      18 14 ec VV CC      VV = 0x55 ^  ( 0x40-0xFF ) 
+Set B-width rate:     18 14 ef VV CC      VV = 0x55 ^  ( 0x00-0xFF ) 
+Set B-width options:  18 14 eb VV CC      (rate/value)  (no,no)=54 18         (pace,no)=74 38          (MA,no)=14 d8
+                                                        (no,val/width)=51 05  (pace,val/width)=71 25   (MA,val/width)=11 c5
+                                                        (no,min/width)=50 04  (pace,min/width)=70 24   (MA,min/width))=10 c4
+
+
