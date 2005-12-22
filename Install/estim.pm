@@ -19,7 +19,7 @@
 
 
 #######################################################################################
-#         Package to interface with the ESTIM via a serial port                       #
+#       Package to interface with the ESTIM via a serial port, version 2.00           #
 #######################################################################################
 
 package IO::estim;
@@ -443,7 +443,7 @@ if( ( substr($reply, 0, 1 ) ne "\x22" ) || ( $sum != ord(substr($reply, 2, 1 ) )
         return -1;
         }
 my $j = ord(substr( $reply, 1, 1 ));
-return $j;
+return 255 - $j;           # higher numbers result in faster rates
 }
 
 
@@ -508,7 +508,7 @@ if( ( substr($reply, 0, 1 ) ne "\x22" ) || ( $sum != ord(substr($reply, 2, 1 ) )
         return -1;
         }
 my $j = ord(substr( $reply, 1, 1 ));
-return $j;
+return 255 - $j;           # higher numbers result in faster rates
 }
 
 ########################################################################################################
@@ -524,7 +524,7 @@ if( ( substr($reply, 0, 1 ) ne "\x22" ) || ( $sum != ord(substr($reply, 2, 1 ) )
         return -1;
         }
 my $j = ord(substr( $reply, 1, 1 ));
-return $j;
+return 255 - $j;           # higher numbers result in faster rates
 }
 
 ########################################################################################################
@@ -896,6 +896,7 @@ my $l = shift;          # level to set to:  0-255
 if( $l < 0 ) { $l = 0; }
 if( $l > 255 ) { $l = 255; }
 $l = int( $l );    # make sure it's an integer
+$l = 255 - $l;     # higher numbers result in a faster rate
 $l ^= 0x55;
 if( $self->{DEBUG} > 0 ) { printf( "Set channel A width rate=0x%02X\n", $l); }
 my $msg = "\x18\x15\xEF" . chr( $l ) . chr( $tbl[ $l ] );   # concatenate the level and sumcheck chars
@@ -1048,6 +1049,7 @@ my $l = shift;          # freq to set to:  0-255
 if( $l < 0 ) { $l = 0; }
 if( $l > 255 ) { $l = 255; }
 $l = int( $l );    # make sure it's an integer
+$l = 255 - $l;     # higher numbers result in a faster rate
 $l ^= 0x55;
 my $indx = $l;
 if( $self->{DEBUG} > 0 ) { printf( "Set channel A freq rate=0x%02X\n", $l); }
@@ -1087,6 +1089,7 @@ my $l = shift;          # level rate to set to:  0-255
 if( $l < 0 ) { $l = 0; }
 if( $l > 255 ) { $l = 255; }
 $l = int( $l );    # make sure it's an integer
+$l = 255 - $l;     # higher numbers result in a faster rate
 $l ^= 0x55;
 my $indx = $l;
 if( $self->{DEBUG} > 0 ) { printf( "Set channel A min level=0x%02X\n", $l); }
@@ -1357,7 +1360,7 @@ if( ( substr($reply, 0, 1 ) ne "\x22" ) || ( $sum != ord(substr($reply, 2, 1 ) )
         return -1;
         }
 my $j = ord(substr( $reply, 1, 1 ));
-return $j;
+return 255 - $j;           # higher numbers result in faster rates
 }
 ########################################################################################################
 #  get the frequency of channel B: 0-247, return -1 if error
@@ -1420,7 +1423,7 @@ if( ( substr($reply, 0, 1 ) ne "\x22" ) || ( $sum != ord(substr($reply, 2, 1 ) )
         return -1;
         }
 my $j = ord(substr( $reply, 1, 1 ));
-return $j;
+return 255 - $j;           # higher numbers result in faster rates
 }
 
 
@@ -1437,7 +1440,7 @@ if( ( substr($reply, 0, 1 ) ne "\x22" ) || ( $sum != ord(substr($reply, 2, 1 ) )
         return -1;
         }
 my $j = ord(substr( $reply, 1, 1 ));
-return $j;
+return 255 - $j;           # higher numbers result in faster rates
 }
 
 ########################################################################################################
@@ -1806,6 +1809,7 @@ my $l = shift;          # level to set to:  0-191
 if( $l < 0 ) { $l = 0; }
 if( $l > 255 ) { $l = 255; }
 $l = int( $l );    # make sure it's an integer
+$l = 255 - $l;     # higher numbers result in a faster rate
 $l ^= 0x55;
 if( $self->{DEBUG} > 0 ) { printf( "Set channel B width rate=0x%02X\n", $l); }
 my $msg = "\x18\x14\xEF" . chr( $l ) . chr( $tbl[ $l ] );   # concatenate the level and sumcheck chars
@@ -1959,6 +1963,7 @@ my $l = shift;          # max freq to set to:  0-255
 if( $l < 0 ) { $l = 0; }
 if( $l > 255 ) { $l = 255; }
 $l = int( $l );    # make sure it's an integer
+$l = 255 - $l;     # higher numbers result in a faster rate
 $l ^= 0x55;
 my $indx = $l;
 if( $self->{DEBUG} > 0 ) { printf( "Set channel B freq rate=0x%02X\n", $l); }
@@ -1997,6 +2002,7 @@ my $l = shift;          # level rate to set to:  0-255
 if( $l < 0 ) { $l = 0; }
 if( $l > 255 ) { $l = 255; }
 $l = int( $l );    # make sure it's an integer
+$l = 255 - $l;     # higher numbers result in a faster rate
 $l ^= 0x55;
 my $indx = $l;
 if( $self->{DEBUG} > 0 ) { printf( "Set channel B level rate=0x%02X\n", $l); }

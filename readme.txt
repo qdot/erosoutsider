@@ -52,8 +52,8 @@ install\UPDmsg.pm      A Perl package that enables interprocess communication
 install\manual.doc     A WORD file that describes the communications protocol
 install\protocol.txt   A text file that describes the communications protocol
 install\estim.pm       A Perl package that impliments the communications protocol
-install\serial\*       29 files for the Win32::SerialPort Perl package
-install\wxperl\*       many files and directories for the WxPerl package
+install\serial\*       files for the Win32::SerialPort Perl package
+install\wxperl\*       files and directories for the WxPerl package
 
 ---
 
@@ -116,3 +116,10 @@ as it's only used with them.  Any time other software, such as ErosLink, is
 used to communicate with the device, you will need to power cycle the device 
 before these scripts will work. 
 
+----------------------------------Version Log----------------------------------
+
+2.00  12/21/2005 Added 'dramp' command to script
+                 Changed rate values so that higher values result in faster ramps
+                 Added 'get' commands to script
+
+1.00  12/16/2005 Initial release

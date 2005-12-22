@@ -20,7 +20,7 @@
 #  written using any text editor, such #  as notepad (windows) or pico (linux).  The user 
 #  interface is a GUI, created using wxPerl.
 #
-#
+#  Version 2.00
 ################  Script Syntax ######################################
 #
 #   COMMENTS        ->  any text that follows a '#', on a line by itself or following a command
@@ -71,15 +71,23 @@
 #
 ####
 #
-#   ESTIM set<ch> time <ON> <OFF>  set the time-on and time-off values on channel <ch> to the fixed amount given, <ch> = 'A' or 'B', 
+#   ESTIM set <ch> time <ON> <OFF>  set the time-on and time-off values on channel <ch> to the fixed amount given, <ch> = 'A' or 'B', 
 #                              <ON>=0-100   <OFF>=0-100
-#   ESTIM set<ch> level <NN>   set the level on channel <ch> to the fixed amount given, <ch> = 'A' or 'B', <NN>=0-100
-#   ESTIM set<ch> freq  <NN>   set the frequency on channel <ch> to the fixed amount given, <ch> = 'A' or 'B', <NN>=0-100
-#   ESTIM set<ch> width <NN>   set the pulse width on channel <ch> to the fixed amount given, <ch> = 'A' or 'B', <NN>=0-100
+#   ESTIM set <ch> level <NN>   set the level on channel <ch> to the fixed amount given, <ch> = 'A' or 'B', <NN>=0-100
+#   ESTIM set <ch> freq  <NN>   set the frequency on channel <ch> to the fixed amount given, <ch> = 'A' or 'B', <NN>=0-100
+#   ESTIM set <ch> width <NN>   set the pulse width on channel <ch> to the fixed amount given, <ch> = 'A' or 'B', <NN>=0-100
+
+#   ESTIM get <ch> time         v1 = <TIME ON>   v2 = <TIME OFF>
+#   ESTIM get <ch> level        v1 = <LEVEL>
+#   ESTIM get <ch> freq         v1 = <FREQ>
+#   ESTIM get <ch> width        v1 = <WIDTH>
 #
 #   ESTIM ramp <ch> level <min> <max> <rate>   start an ongoing ramp on channel <ch>, <ch> = 'A' or 'B', <min>,<max>,& <rate>=0-100
 #   ESTIM ramp <ch> freq  <min> <max> <rate>   start an ongoing ramp on channel <ch>, <ch> = 'A' or 'B', <min>,<max>,& <rate>=0-100
 #   ESTIM ramp <ch> width <min> <max> <rate>   start an ongoing ramp on channel <ch>, <ch> = 'A' or 'B', <min>,<max>,& <rate>=0-100
+#   ESTIM dramp <ch> level <min> <max> <rate>  start an ongoing ramp on channel <ch>, <ch> = 'A' or 'B', <min>,<max>,& <rate>=0-100
+#   ESTIM dramp <ch> freq  <min> <max> <rate>  start an ongoing ramp on channel <ch>, <ch> = 'A' or 'B', <min>,<max>,& <rate>=0-100
+#   ESTIM dramp <ch> width <min> <max> <rate>  start an ongoing ramp on channel <ch>, <ch> = 'A' or 'B', <min>,<max>,& <rate>=0-100
 #
 #   ESTIM options <ch> time  <on>  <off>       set time options on channel <ch>, <ch> = 'A' or 'B', 
 #                                                  on:     1=none   5=EFFECT        9=MA     
@@ -93,6 +101,14 @@
 #   ESTIM options <ch> width <val> <rate>      set width options on channel <ch>, <ch> = 'A' or 'B', 
 #                                                  val:    1=none   4=val/width     5=min/width
 #                                                  rate:   0=none   2=pace          4=MA
+####
+#   notes/hints/ideas:
+#      1) Setting freq to MA, means that the MA control has direct control of the frequency setting. if the MA control
+#         is set full clockwise, the freq will be 100.  Full counterclockwise, it will be 0.  At the middle setting
+#         it will read around 77.
+#      2) When setting up ramps, a higher value for 'rate' will cause the value to change faster.
+#      3) a 'ramp' starts at the 'min' setting and rises to the 'max' setting, time permitting, it will then reverse direction
+#      4) a 'dramp' starts at the 'max' setting and falls to the 'min' setting, time permitting, it will then reverse direction
 ####
 #
 #   run  <name> <name>    -> stops execution of the current script, and runs the named script(s)
@@ -498,6 +514,7 @@ our @P = undef;                   # parameters to subroutines
 our @R = undef;                   # return values from subroutines
 our $et = undef;                  # object for ESTIM communication
 our @SV = (1, -1, -1, -1, -1, -1, -1,  -1, -1, -1, -1);   # saved values from device
+our @SVi =(0,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0);            # saved values from device, rationalized 0-100
 my $port = 1;                     # the SerialPort to use, IE COM-1, etc
 
 #################### decode messages from GUI ##############################
@@ -802,6 +819,30 @@ sub process {                   #   $_[0]  is undef or the name of the currently
     else                  { $prefix = ""; }
 
 
+    if( /^ESTIM get ([AB]) time$/ ) {                                       #  "ESTIM get A time"
+        if( $1 eq "A" ) {  $V[1] = $SVi[1];  $V[2] = $SVi[2];  }
+        else            {  $V[1] = $SVi[6];  $V[2] = $SVi[7];   }
+        return;
+        } 
+
+    if( /^ESTIM get ([AB]) level$/ ) {                                      #  "ESTIM get A level"
+        if( $1 eq "A" ) {  $V[1] = $SVi[3];  }
+        else            {  $V[1] = $SVi[8];  }
+        return;
+        } 
+
+    if( /^ESTIM get ([AB]) freq$/ ) {                                       #  "ESTIM get A freq"
+        if( $1 eq "A" ) {  $V[1] = $SVi[4];  }
+        else            {  $V[1] = $SVi[9];  }
+        return;
+        } 
+
+    if( /^ESTIM get ([AB]) width$/ ) {                                      #  "ESTIM get A width"
+        if( $1 eq "A" ) {  $V[1] = $SVi[5];  }
+        else            {  $V[1] = $SVi[10];  }
+        return;
+        } 
+
     if( /^ESTIM set ([AB]) level ([cghmprstvHL0-9\?\.]+)$/ ) {              #  "ESTIM set A level 25"
         my $val = int( 0.50 + 127 * &number( $2 ) / 100 );
         my $cc;
@@ -934,6 +975,70 @@ sub process {                   #   $_[0]  is undef or the name of the currently
         if( $cc != 4 ) { die "ESTIM width not able to be set\n"; }
         return;
         } 
+
+    if( /^ESTIM dramp ([AB]) level ([cghmprstvHL0-9\?\.]+) ([cghmprstvHL0-9\?\.]+) ([cghmprstvHL0-9\?\.]+)$/ ) { #  "ESTIM ramp A level 25 50 20"
+        my $min  = int( 0.50 + 127 * &number( $2 ) / 100 );
+        my $max  = int( 0.50 + 127 * &number( $3 ) / 100 );
+        my $rate = int( 0.50 + 255 * &number( $4 ) / 100 );
+        my $cc;
+        if( $1 eq "A" ) {  
+            $cc = $et->set_A_max_level( $max ); 
+            $cc += $et->set_A_min_level( $min ); 
+            $cc += $et->set_A_level( $max ); 
+            $cc += $et->set_A_level_rate( $rate ); 
+            }
+        else            {  
+            $cc = $et->set_B_max_level( $max ); 
+            $cc += $et->set_B_min_level( $min ); 
+            $cc += $et->set_B_level( $max ); 
+            $cc += $et->set_B_level_rate( $rate ); 
+            }
+        if( $cc != 4 ) { die "ESTIM level not able to be set\n"; }
+        return;
+        } 
+
+    if( /^ESTIM dramp ([AB]) freq ([cghmprstvHL0-9\?\.]+) ([cghmprstvHL0-9\?\.]+) ([cghmprstvHL0-9\?\.]+)$/ ) {  #  "ESTIM ramp A freq 25 50 20"
+        my $min  = int( 0.50 + 247 * &number( $2 ) / 100 );
+        my $max  = int( 0.50 + 247 * &number( $3 ) / 100 );
+        my $rate = int( 0.50 + 255 * &number( $4 ) / 100 );
+        my $cc;
+        if( $1 eq "A" ) {  
+            $cc = $et->set_A_max_freq( $max ); 
+            $cc += $et->set_A_min_freq( $min ); 
+            $cc += $et->set_A_freq( $max ); 
+            $cc += $et->set_A_freq_rate( $rate ); 
+            }
+        else            {  
+            $cc = $et->set_B_max_freq( $max ); 
+            $cc += $et->set_B_min_freq( $min ); 
+            $cc += $et->set_B_freq( $max ); 
+            $cc += $et->set_B_freq_rate( $rate ); 
+            }
+        if( $cc != 4 ) { die "ESTIM freq not able to be set\n"; }
+        return;
+        } 
+
+    if( /^ESTIM dramp ([AB]) width ([cghmprstvHL0-9\?\.]+) ([cghmprstvHL0-9\?\.]+) ([cghmprstvHL0-9\?\.]+)$/ ) {  #  "ESTIM ramp A width 25 50 20"
+        my $min  = int( 0.50 + 191 * &number( $2 ) / 100 );
+        my $max  = int( 0.50 + 191 * &number( $3 ) / 100 );
+        my $rate = int( 0.50 + 255 * &number( $4 ) / 100 );
+        my $cc;
+        if( $1 eq "A" ) {  
+            $cc = $et->set_A_max_width( $max ); 
+            $cc += $et->set_A_min_width( $min ); 
+            $cc += $et->set_A_width( $max ); 
+            $cc += $et->set_A_width_rate( $rate ); 
+            }
+        else            {  
+            $cc = $et->set_B_max_width( $max ); 
+            $cc += $et->set_B_min_width( $min ); 
+            $cc += $et->set_B_width( $max ); 
+            $cc += $et->set_B_width_rate( $rate ); 
+            }
+        if( $cc != 4 ) { die "ESTIM width not able to be set\n"; }
+        return;
+        } 
+
 
     if( /^ESTIM options ([AB]) time ([cghmprstvHL0-9\?\.]+) ([cghmprstvHL0-9\?\.]+)$/ ) {  #  "ESTIM options A time 1 0"
         my $on  = &number( $2 );
@@ -1394,7 +1499,7 @@ if( $SV[0] == 1 ) {
    $val = $et->get_A_time_on();                    # get the TIME ON for channel A, $val=0-255, -1=error
    if(( $val >= 0 ) && ( $val != $SV[1] )) {
        $SV[1] = $val;
-       $val = int( 0.50 + 100 * $val / 255 );
+       $SVi[1] = $val = int( 0.50 + 100 * $val / 255 );
        $IPC->write( 9000, "slider 1 $val" );       # notify GUI
        }
    }
@@ -1402,7 +1507,7 @@ if( $SV[0] == 2 ) {
    $val = $et->get_A_time_off();                   # get the TIME OFF for channel A, $val=0-255, -1=error
    if(( $val >= 0 ) && ( $val != $SV[2] )) {
        $SV[2] = $val;
-       $val = int( 0.50 + 100 * $val / 255 );
+       $SVi[2] = $val = int( 0.50 + 100 * $val / 255 );
        $IPC->write( 9000, "slider 2 $val" );       # notify GUI
        }
    }
@@ -1410,7 +1515,7 @@ if( $SV[0] == 3 ) {
    $val = $et->get_A_level();                      # get the level of channel A, $val=0-127, -1=error
    if(( $val >= 0 ) && ( $val != $SV[3] )) {
        $SV[3] = $val;
-       $val = int( 0.50 + 100 * $val / 127 );
+       $SVi[3] = $val = int( 0.50 + 100 * $val / 127 );
        $IPC->write( 9000, "slider 3 $val" );       # notify GUI
        }
    }
@@ -1418,7 +1523,7 @@ if( $SV[0] == 4 ) {
    $val = $et->get_A_freq();                       # get the frequency for channel A, $val=8-255, -1=error
    if(( $val >= 0 ) && ( $val != $SV[4] )) {
        $SV[4] = $val;
-       $val = int( 0.50 + (100 * $val / 247) );
+       $SVi[4] = $val = int( 0.50 + (100 * $val / 247) );
        $IPC->write( 9000, "slider 4 $val" );       # notify GUI
        }
    }
@@ -1426,7 +1531,7 @@ if( $SV[0] == 5 ) {
    $val = $et->get_A_width();                      # get the pulse width for channel A, $val=0-191, -1=error
    if(( $val >= 0 ) && ( $val != $SV[5] )) {
        $SV[5] = $val;
-       $val = int( 0.50 + 100 * $val / 191 );
+       $SVi[5] = $val = int( 0.50 + 100 * $val / 191 );
        $IPC->write( 9000, "slider 5 $val" );       # notify GUI
        }
 
@@ -1436,7 +1541,7 @@ if( $SV[0] == 6 ) {
    $val = $et->get_B_time_on();                 # get the TIME ON for channel B, $val=0-255, -1=error             
    if(( $val >= 0 ) && ( $val != $SV[6] )) {
        $SV[6] = $val;
-       $val = int( 0.50 + 100 * $val / 255 );
+       $SVi[6] = $val = int( 0.50 + 100 * $val / 255 );
        $IPC->write( 9000, "slider 6 $val" );       # notify GUI
        }
    }
@@ -1444,7 +1549,7 @@ if( $SV[0] == 7 ) {
    $val = $et->get_B_time_off();                 # get the TIME OFF for channel B, $val=0-255, -1=error             
    if(( $val >= 0 ) && ( $val != $SV[7] )) {
        $SV[7] = $val;
-       $val = int( 0.50 + 100 * $val / 255 );
+       $SVi[7] = $val = int( 0.50 + 100 * $val / 255 );
        $IPC->write( 9000, "slider 7 $val" );       # notify GUI
        }
    }
@@ -1452,7 +1557,7 @@ if( $SV[0] == 8 ) {
    $val = $et->get_B_level();                      # get the level of channel B, $val=0-127, -1=error
    if(( $val >= 0 ) && ( $val != $SV[8] )) {
        $SV[8] = $val;
-       $val = int( 0.50 + 100 * $val / 127 );
+       $SVi[8] = $val = int( 0.50 + 100 * $val / 127 );
        $IPC->write( 9000, "slider 8 $val" );       # notify GUI
        }
    }
@@ -1460,7 +1565,7 @@ if( $SV[0] == 9 ) {
    $val = $et->get_B_freq();                       # get the frequency for channel B, $val=8-255, -1=error
    if(( $val >= 0 ) && ( $val != $SV[9] )) {
        $SV[9] = $val;
-       $val = int( 0.50 + 100 * $val / 247 );
+       $SVi[9] = $val = int( 0.50 + 100 * $val / 247 );
        $IPC->write( 9000, "slider 9 $val" );       # notify GUI
        }
    }
@@ -1468,7 +1573,7 @@ if( $SV[0] == 10 ) {
    $val = $et->get_B_width();                      # get the pulse width for channel B, $val=0-191, -1=error
    if(( $val >= 0 ) && ( $val != $SV[10] )) {
        $SV[10] = $val;
-       $val = int( 0.50 + 100 * $val / 191 );
+       $SVi[10] = $val = int( 0.50 + 100 * $val / 191 );
        $IPC->write( 9000, "slider 10 $val" );       # notify GUI
        }
    }
