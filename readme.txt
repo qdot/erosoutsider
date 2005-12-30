@@ -50,11 +50,12 @@ install\install.bat    A batch file to install the ET-312 packages, used in step
 install\install.pl     A Perl script to complete the installation process
 install\UPDmsg.pm      A Perl package that enables interprocess communication
 install\manual.doc     A WORD file that describes the communications protocol
-install\protocol.txt   A text file that describes the communications protocol
 install\estim.pm       A Perl package that impliments the communications protocol
+install\estim.inc      A Perl package that contains environment variables
 install\serial\*       files for the Win32::SerialPort Perl package
 install\wxperl\*       files and directories for the WxPerl package
 
+contrib\*              scripts contributed by others
 ---
 
 Installation notes:
@@ -81,13 +82,16 @@ This script will:
     install WxPerl
     install IPC::UDPmsg.pm
     install IO::estim.pm
+    install IO::estim.inc
+
+4) Manually edit install\estim.inc as needed, and then place it in 
+c:\perl\site\lib\io or another directory as appropriate.
 
 
+5) Using ErosLink, install the session  Idle.eis  as User 1.
 
-4) Using ErosLink, install the session  Idle.eis  as User 1.
 
-
-5) To run the test program, connect the ESTIM device to your serial port, the 
+6) To run the test program, connect the ESTIM device to your serial port, the 
 software assumes you are using port 1, and you will need to adjust the source
 code if using something different. Look for the line where $port is set.
 The waves.txt script works best if the device is runnning the idle.eis installed 
@@ -117,6 +121,10 @@ used to communicate with the device, you will need to power cycle the device
 before these scripts will work. 
 
 ----------------------------------Version Log----------------------------------
+
+3.00  12/29/2005 Checksum is now calculated instead of being looked up in a table
+                 estim.inc has been added to contain installation dependant 'stuff'
+                 manual.doc updated to reflect better understanding of protocol
 
 2.00  12/21/2005 Added 'dramp' command to script
                  Changed rate values so that higher values result in faster ramps

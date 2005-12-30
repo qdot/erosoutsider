@@ -74,7 +74,7 @@ if( ! -e "c:/perl/site/lib/io" ) {
 # directory already exists
 
 system( "copy /Y estim.pm  c:\\perl\\site\\lib\\io" );
-print "estim is installed\n\n";
+print "estim.pm is installed\n\n";
 
 skip:
   exit;
