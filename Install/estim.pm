@@ -1,3 +1,5 @@
+# IO::estim.pm
+
 #####################################################################
 # 
 #  This program is free software; you can redistribute it and/or
@@ -19,7 +21,7 @@
 
 
 #######################################################################################
-#       Package to interface with the ESTIM via a serial port, version 3.00           #
+#       Package to interface with the ESTIM via a serial port, version 4.00           #
 #######################################################################################
 
 package IO::estim;
@@ -42,6 +44,7 @@ require "IO/estim.inc";       # configuration dependant information
 #        76=waves     77=stroke    78=climb     79=combo    7A=intense    7B=rhythm     7C=audio1
 #        7D=audio2    7E=audio3    7F=split     80=random1  81=random2    82=toggle     83=orgasm 
 #        84=torment   85=phase1    86=phase2    87=phase3   88=user1      89=user2      8A=user3
+#  my $val = $et->get_byte($adr);               # get the byte at the given address, $val=0-255, -1=error
 #-------
 #  my $val = $et->get_A_time_on();              # get the TIME ON for channel A, $val=0-255, -1=error
 #  my $val = $et->get_A_time_off();             # get the TIME OFF for channel A, $val=0-255, -1=error
@@ -253,6 +256,33 @@ sub new {
 
 
 ########################################################################################################
+#  get the routine number: NN, return -1 if error
+########################################################################################################
+sub get_routine {
+my $self = shift;  # get the object
+my $reply = &CommPlus( $self->{COMM}, "\x3C\x40\x7B", $self->{MOD2}, $self->{DEBUG} );
+my $j = &Check( $reply );
+return $j;
+}
+
+
+########################################################################################################
+#  get the data byte from a given address, return -1 if error
+########################################################################################################
+sub get_byte {
+my $self = shift;  # get the object
+my $adr  = shift;  # get the address
+$adr = int ( $adr );     # make sure it's a integer
+if( ($adr < 0 ) || ($adr > 0xffff) ) { return -1; }
+my $b1 = $adr >> 8;             # upper byte of address
+my $b2 = $adr & 255;            # lower byte of address
+my $msg = "\x3C" . chr( $b1 ) . chr( $b2 );   # build inquiry message
+my $reply = &CommPlus( $self->{COMM}, $msg, $self->{MOD2}, $self->{DEBUG} );
+my $j = &Check( $reply );
+return $j;
+}
+
+########################################################################################################
 #  get the time options channel: NN, return (-1,-1) if error
 ########################################################################################################
 sub get_A_time_options {
@@ -344,17 +374,6 @@ if( $j < 0 ) { return (-1,-1); }
 my $val = $j & 15;            # val options are in lower nibble
 my $rate = $j >> 4;           # rate options are in upper nibble
 return ($val, $rate);
-}
-
-
-########################################################################################################
-#  get the routine number: NN, return -1 if error
-########################################################################################################
-sub get_routine {
-my $self = shift;  # get the object
-my $reply = &CommPlus( $self->{COMM}, "\x3C\x40\x7B", $self->{MOD2}, $self->{DEBUG} );
-my $j = &Check( $reply );
-return $j;
 }
 
 
@@ -1239,6 +1258,7 @@ sub CommPlus() {
 ########################################################################################################
 sub Check() {
    my $msg = shift;             # the 3 byte message to check
+   if( length( $msg ) != 3 )  { return -1; }
    my $b1 =  ord(substr($msg, 0, 1 ) );
    my $b2 =  ord(substr($msg, 1, 1 ) );
    my $b3 =  ord(substr($msg, 2, 1 ) );

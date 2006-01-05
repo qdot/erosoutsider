@@ -1,3 +1,5 @@
+#!/usr/bin/perl -w
+
 #####################################################################
 # 
 #  This program is free software; you can redistribute it and/or
@@ -18,7 +20,7 @@
 
 
 #####################################################################
-#          script to test the ESTIM package, version 3.00           #
+#          script to test the ESTIM package, version 4.00           #
 #####################################################################
 
 use strict;

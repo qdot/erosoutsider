@@ -1,3 +1,5 @@
+#!/usr/bin/perl -w
+
 #####################################################################
 # 
 #  This program is free software; you can redistribute it and/or
@@ -20,7 +22,7 @@
 #  written using any text editor, such #  as notepad (windows) or pico (linux).  The user 
 #  interface is a GUI, created using wxPerl.
 #
-#  Version 2.00
+#  Version 4.00
 ################  Script Syntax ######################################
 #
 #   COMMENTS        ->  any text that follows a '#', on a line by itself or following a command
@@ -498,21 +500,21 @@ if( my $pid = fork ) {                # parent
 #########################################################################
 srand();                          # set the ramdom seed
 
-my @G = undef;                    # no global variables have values initually
+my @G = ();                       # no global variables have values initually
 my $subdef = undef;               # subroutine currently being defined, none to start
 
-my %TAGS = undef;                 # no tags are defined initially
-my %LINK = undef;                 # no slider links are defined initially
-my @script = undef;               # memory copy of user's script
-my @CB = undef;                   # check boxes, hold as global variables, values = (0,1)
-my @SR = undef;                   # sliders, hold as global variables, values = (min,max)
+my %TAGS = ();                    # no tags are defined initially
+my %LINK = ();                    # no slider links are defined initially
+my @script = ();                  # memory copy of user's script
+my @CB = ();                      # check boxes, hold as global variables, values = (0,1)
+my @SR = ();                      # sliders, hold as global variables, values = (min,max)
 
 our $line_no = 1;                 # script line number
 our $CC   = 0;                    # initial value of completion code
-our @V = undef;                   # no variables have values initually, only the globals survive
-our @P = undef;                   # parameters to subroutines
-our @R = undef;                   # return values from subroutines
-our $et = undef;                  # object for ESTIM communication
+our @V = ();                      # no variables have values initually, only the globals survive
+our @P = ();                      # parameters to subroutines
+our @R = ();                      # return values from subroutines
+our $et = ();                     # object for ESTIM communication
 our @SV = (1, -1, -1, -1, -1, -1, -1,  -1, -1, -1, -1);   # saved values from device
 our @SVi =(0,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0);            # saved values from device, rationalized 0-100
 my $port = 1;                     # the SerialPort to use, IE COM-1, etc
@@ -536,13 +538,13 @@ while(1) {
             $IPC->write( 9000, "Status: Script Loading" );
             $IPC->write( 9000, "File: $1" );
 
-            %TAGS = undef;                 # no tags are defined initially
-            %LINK = undef;                 # no slider links are defined initially
-            @script = undef;               # memory copy of user's script
+            %TAGS = ();                    # no tags are defined initially
+            %LINK = ();                    # no slider links are defined initially
+            @script = ();                  # memory copy of user's script
             $line_no = 1;                  # script line number
-            @V = undef;                    # no variables have values initually, only the globals survive
-            @CB = undef;                   # check boxes have no initial values
-            @SR = undef;                   # sliders have no initial values
+            @V = ();                       # no variables have values initually, only the globals survive
+            @CB = ();                      # check boxes have no initial values
+            @SR = ();                      # sliders have no initial values
             $subdef = undef;               # subroutine currently being defined, none to start
 
             &loadscript( $1 );
@@ -699,7 +701,7 @@ while (<$SFILE>) {
         }
     $script[ $line_no++ ] = $_;     # save the script line, icr $line_no only for lines that are stored
     }
-close(SFILE);
+close($SFILE);
 }
 
 
@@ -718,7 +720,7 @@ sub runscript {
     my ( $me ) = undef;
 
     if( defined @_ ) {                                                    # running in a subroutine
-        $me = @_[0];                                                           # save my subroutine name
+        $me = $_[0];                                                           # save my subroutine name
         @P = @_;                                                               # tranfer the parms to an array, $P[0] = name, but it does not hurt
 
     if( $DEBUG > 0 ) {
@@ -1179,7 +1181,7 @@ sub process {                   #   $_[0]  is undef or the name of the currently
 
     if( /^sleep ([cghmprstvHL0-9\?\.]+)$/ ) {                           #    sleep ii
         my ($dur, $i, $j, $k);
-        my $dur = 64 * &number( $1 );              # number of seconds to delay, approx 64 loops per second
+        $dur = 64 * &number( $1 );              # number of seconds to delay, approx 64 loops per second
 
         for( $i=0; $i < $dur; $i++ ) {
             if( my $msg = $IPC->read() ) {                                          #  if a message has been receive from the GUI
@@ -1194,7 +1196,7 @@ sub process {                   #   $_[0]  is undef or the name of the currently
 
     if( /^usleep ([cghmprstvHL0-9\?\.]+)$/ ) {                     #    usleep ii 
         my ($dur, $i, $j, $k);
-        my $dur = &number( $1 ) / 16000;         # the present value of the variable
+        $dur = &number( $1 ) / 16000;         # the present value of the variable
 
         for( $i=0; $i < $dur; $i++ ) {
             if( my $msg = $IPC->read() ) {                                          #  if a message has been receive from the GUI
@@ -1304,9 +1306,9 @@ sub process {                   #   $_[0]  is undef or the name of the currently
         my $str = $2;
         $str =~ /^(\w+)\s?/;
         my @RET = ( $1 );                     # strip out the LABEL or subroutine name
-        my $str = $2;
+        $str = $2;
         $str =~ /^(\w+)\s?/;
-        my @RET = ( $1 );                     # strip out the LABEL or subroutine name
+        @RET = ( $1 );                        # strip out the LABEL or subroutine name
         $str = substr( $str, length($&) );
         while ( $str =~ /^([cghmprstvHL0-9\?\.]+)\s?/ ) {
             my $val = $1;

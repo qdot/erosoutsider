@@ -121,6 +121,11 @@ used to communicate with the device, you will need to power cycle the device
 before these scripts will work. 
 
 ----------------------------------Version Log----------------------------------
+4.00             new function added: my $val = $et->get_byte($adr);
+                         gets the byte at the given address, $val=0-255, -1=error
+                 misc syntax errors fixed in script.pl
+                 dump.pl  script added, provides hex dump of device locations
+                         as if they were memory locations.
 
 3.00  12/29/2005 Checksum is now calculated instead of being looked up in a table
                  estim.inc has been added to contain installation dependant 'stuff'
